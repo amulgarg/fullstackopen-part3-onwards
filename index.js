@@ -1,7 +1,9 @@
 const express = require('express');
 const app = express();
+const morgan = require('morgan');
 
 app.use(express.json());
+app.use(morgan('tiny'));
 
 function randomInteger(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -68,6 +70,8 @@ app.get('/api/persons/:id', (request, response) => {
 })
 
 app.post('/api/persons', (request, response) => {	
+
+	//console.log('request obj', request);
 	const newPerson = request.body;
 
 	if(!newPerson.name){
