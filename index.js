@@ -61,6 +61,17 @@ app.get('/api/persons/:id', (request, response) => {
   return response.json(person);
 })
 
+app.delete('/api/persons/:id', (request, response) => {
+	const remainingPersons = persons.filter(person => person.id != request.params.id);
+
+	console.log('remainingPersons', remainingPersons);
+
+	if(remainingPersons.length === persons.length){
+		return response.status(404).send({error: "NOT_FOUND"});
+	} 
+  return response.status(204).end();
+})
+
 app.get('/info', (request, response) => {
 	response.send(`<div><div>Phonebook has info for ${persons.length} people</div>${new Date()}</div>`);
 })
