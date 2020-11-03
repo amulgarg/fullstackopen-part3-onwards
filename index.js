@@ -69,6 +69,21 @@ app.get('/api/persons/:id', (request, response) => {
 
 app.post('/api/persons', (request, response) => {	
 	const newPerson = request.body;
+
+	if(!newPerson.name){
+		return response.status(400).send({error: 'name is required'});
+	}
+
+	if(!newPerson.number){
+		return response.status(400).send({error: 'number is required'});
+	}
+
+	const doesAlreadyExist = persons.find(person => person.name.toLowerCase() == newPerson.name.toLowerCase());
+
+	if(doesAlreadyExist){
+		return response.status(400).send({error: 'name must be unique'});
+	}
+
 	const largestId = Math.max(...persons.map(person => person.id));
 	newPerson.id = randomInteger(largestId+1, 1000);
 	const updatedPersons = persons.concat(newPerson);
