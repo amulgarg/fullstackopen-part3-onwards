@@ -3,7 +3,13 @@ const app = express();
 const morgan = require('morgan');
 
 app.use(express.json());
-app.use(morgan('tiny'));
+///app.use(morgan('tiny'));
+
+morgan.token('body', function getId (req) {	
+  return JSON.stringify(req.body)
+});
+
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
 function randomInteger(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -70,8 +76,6 @@ app.get('/api/persons/:id', (request, response) => {
 })
 
 app.post('/api/persons', (request, response) => {	
-
-	//console.log('request obj', request);
 	const newPerson = request.body;
 
 	if(!newPerson.name){
@@ -96,9 +100,6 @@ app.post('/api/persons', (request, response) => {
 
 app.delete('/api/persons/:id', (request, response) => {
 	const remainingPersons = persons.filter(person => person.id != request.params.id);
-
-	console.log('remainingPersons', remainingPersons);
-
 	if(remainingPersons.length === persons.length){
 		return response.status(404).send({error: "NOT_FOUND"});
 	} 
