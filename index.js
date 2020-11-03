@@ -1,6 +1,12 @@
 const express = require('express');
 const app = express();
 
+app.use(express.json());
+
+function randomInteger(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 const persons = [
     {
       "name": "Arto Hellas",
@@ -59,6 +65,14 @@ app.get('/api/persons/:id', (request, response) => {
 		return response.status(404).send({error: "NOT_FOUND"});
 	} 
   return response.json(person);
+})
+
+app.post('/api/persons', (request, response) => {	
+	const newPerson = request.body;
+	const largestId = Math.max(...persons.map(person => person.id));
+	newPerson.id = randomInteger(largestId+1, 1000);
+	const updatedPersons = persons.concat(newPerson);
+  response.json(updatedPersons);
 })
 
 app.delete('/api/persons/:id', (request, response) => {
