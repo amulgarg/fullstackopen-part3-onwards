@@ -110,7 +110,7 @@ app.get('/info', (request, response) => {
 	response.send(`<div><div>Phonebook has info for ${persons.length} people</div>${new Date()}</div>`);
 })
 
-const PORT = 3003
+const PORT = process.env.PORT || 3003
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
