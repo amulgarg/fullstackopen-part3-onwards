@@ -4,6 +4,7 @@ const morgan = require('morgan');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const Person = require('./models/persons');
+const { request, response } = require('express');
 
 app.use(express.static('build'));
 
@@ -86,18 +87,19 @@ app.get('/api/persons', (request, response, next) => {
   return response.json(person);
 }) */
 
-app.post('/api/persons', (request, response, next) => {	
-
-	const newPerson = new Person({
+app.post('/api/persons', (request, response, next) => {
+	
+	const payload = {
 		name: request.body.name,
 		number: request.body.number
-	})
-	
+	};
+
+	const newPerson = new Person(payload);
 	newPerson.save().then(result => {
-		console.log('note saved!', result);
+		console.log('note created', result);
 		response.json(result);
 		//mongoose.connection.close()
-	}).catch(error => next(error))
+	}).catch(error => next(error));	
 
 	/* if(!newPerson.name){
 		return response.status(400).send({error: 'name is required'});
@@ -118,7 +120,7 @@ app.post('/api/persons', (request, response, next) => {
 
 	const updatedPersons = persons.concat(newPerson);
   response.json(updatedPersons);	*/
-})
+});
 
 app.delete('/api/persons/:id', (request, response, next) => {
 	Person.findByIdAndRemove(request.params.id).then((result) => {
@@ -138,6 +140,21 @@ app.delete('/api/persons/:id', (request, response, next) => {
 /* app.get('/info', (request, response) => {
 	response.send(`<div><div>Phonebook has info for ${persons.length} people</div>${new Date()}</div>`);
 }) */
+
+
+app.put('/api/persons/:id', (request, response, next) => {
+
+	const payload = {
+		name: request.body.name,
+		number: request.body.number
+	};
+	
+	Person.findByIdAndUpdate(request.params.id, payload, { new: true }).then((result)=>{
+		console.log('note updated', result);
+		response.json(result);
+	}).catch(error => next(error));
+
+});
 
 const errorHandler = (error, request, response, next) => {
   console.error(error.message)
