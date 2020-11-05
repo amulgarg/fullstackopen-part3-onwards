@@ -71,11 +71,11 @@ function randomInteger(min, max) {
     }
 ]; */
 
-app.get('/api/persons', (request, response) => {
+app.get('/api/persons', (request, response, next) => {
 	Person.find({}).then(personsResponse => {
 		response.json(personsResponse);
 		//mongoose.connection.close();
-	});
+	}).catch(error => next(error));
 })
 
 /* app.get('/api/persons/:id', (request, response) => {
@@ -86,7 +86,7 @@ app.get('/api/persons', (request, response) => {
   return response.json(person);
 }) */
 
-app.post('/api/persons', (request, response) => {	
+app.post('/api/persons', (request, response, next) => {	
 
 	const newPerson = new Person({
 		name: request.body.name,
@@ -97,7 +97,7 @@ app.post('/api/persons', (request, response) => {
 		console.log('note saved!', result);
 		response.json(result);
 		//mongoose.connection.close()
-	})
+	}).catch(error => next(error))
 
 	/* if(!newPerson.name){
 		return response.status(400).send({error: 'name is required'});
@@ -120,7 +120,7 @@ app.post('/api/persons', (request, response) => {
   response.json(updatedPersons);	*/
 })
 
-app.delete('/api/persons/:id', (request, response) => {
+app.delete('/api/persons/:id', (request, response, next) => {
 	Person.findByIdAndRemove(request.params.id).then((result) => {
 		console.log('result', result);
 		//mongoose.connection.close();
