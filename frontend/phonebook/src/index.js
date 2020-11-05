@@ -63,6 +63,9 @@ const App = () => {
         personsService.update(existingPersonWithName.id, newPerson).then(response => {
           const newPersons = persons.map(person => person.id === existingPersonWithName.id ? response : person);
           setPersons(newPersons);
+        }).catch(error => {
+          console.log('error', error.response.data);
+          setErrorMessage(error.response.data.error);
         });
       }
     } else {
@@ -70,6 +73,9 @@ const App = () => {
         setPersons(persons.concat(response));
         setSuccessMessage(`Added ${newPerson.name}`);
         window.setTimeout(()=>setSuccessMessage(null), 3000); //remove after 3 seconds
+      }).catch(error => {
+        console.log('error', error.response.data);
+        setErrorMessage(error.response.data.error);
       });
     }
   }

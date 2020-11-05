@@ -16,11 +16,6 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :b
 
 app.use(cors());
 
-
-function randomInteger(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
 app.get('/api/persons', (request, response, next) => {
 	Person.find({}).then(personsResponse => {
 		response.json(personsResponse);
@@ -73,7 +68,7 @@ app.put('/api/persons/:id', (request, response, next) => {
 		number: request.body.number
 	};
 	
-	Person.findByIdAndUpdate(request.params.id, payload, { new: true }).then((result)=>{
+	Person.findByIdAndUpdate(request.params.id, payload, { new: true, runValidators: true }).then((result)=>{
 		console.log('note updated', result);
 		response.json(result);
 	}).catch(error => next(error));
@@ -85,7 +80,9 @@ const errorHandler = (error, request, response, next) => {
 
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' })
-  } 
+  } else if (error.name === 'ValidationError') {
+    return response.status(400).json({ error: error.message })
+  }
 
   next(error)
 }
