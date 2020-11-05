@@ -11,7 +11,6 @@ const password = process.argv[2];
 const database = 'phonebook';
 
 const url = `mongodb+srv://fullstackopen:${password}@fullstackopen.deixx.mongodb.net/${database}?retryWrites=true&w=majority`;
-  `mongodb+srv://fullstack:${password}@cluster0-ostce.mongodb.net/test?retryWrites=true`
 
 mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true })
 

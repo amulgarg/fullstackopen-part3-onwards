@@ -2,6 +2,8 @@ const express = require('express');
 const app = express();
 const morgan = require('morgan');
 const cors = require('cors');
+const mongoose = require('mongoose');
+const Person = require('./models/persons');
 
 app.use(express.static('build'));
 
@@ -21,7 +23,7 @@ function randomInteger(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-const persons = [
+/* const persons = [
     {
       "name": "Arto Hellas",
       "number": "040-123456",
@@ -67,24 +69,37 @@ const persons = [
       "number": "1777171",
       "id": 9
     }
-];
+]; */
 
 app.get('/api/persons', (request, response) => {
-  response.json(persons)
+	Person.find({}).then(personsResponse => {
+		response.json(personsResponse);
+		//mongoose.connection.close();
+	});
 })
 
-app.get('/api/persons/:id', (request, response) => {
+/* app.get('/api/persons/:id', (request, response) => {
 	const person = persons.find(person => person.id == request.params.id)
 	if(!person){
 		return response.status(404).send({error: "NOT_FOUND"});
 	} 
   return response.json(person);
-})
+}) */
 
 app.post('/api/persons', (request, response) => {	
-	const newPerson = request.body;
+	
+	const newPerson = new Person({
+		name: request.body.name,
+		number: request.body.number
+	})
+	
+	newPerson.save().then(result => {
+		console.log('note saved!', result);
+		response.json(result);
+		mongoose.connection.close()
+	})
 
-	if(!newPerson.name){
+	/* if(!newPerson.name){
 		return response.status(400).send({error: 'name is required'});
 	}
 
@@ -96,25 +111,26 @@ app.post('/api/persons', (request, response) => {
 
 	if(doesAlreadyExist){
 		return response.status(400).send({error: 'name must be unique'});
-	}
+	} 
 
 	const largestId = Math.max(...persons.map(person => person.id));
 	newPerson.id = randomInteger(largestId+1, 1000);
+
 	const updatedPersons = persons.concat(newPerson);
-  response.json(updatedPersons);
+  response.json(updatedPersons);	*/
 })
 
-app.delete('/api/persons/:id', (request, response) => {
+/* app.delete('/api/persons/:id', (request, response) => {
 	const remainingPersons = persons.filter(person => person.id != request.params.id);
 	if(remainingPersons.length === persons.length){
 		return response.status(404).send({error: "NOT_FOUND"});
 	} 
   return response.status(204).end();
-})
+}) */
 
-app.get('/info', (request, response) => {
+/* app.get('/info', (request, response) => {
 	response.send(`<div><div>Phonebook has info for ${persons.length} people</div>${new Date()}</div>`);
-})
+}) */
 
 const PORT = process.env.PORT || 3003
 app.listen(PORT, () => {
