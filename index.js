@@ -8,7 +8,7 @@ app.use(express.static('build'));
 
 app.use(express.json());
 
-morgan.token('body', function getId (req) {	
+morgan.token('body', function getId (req) {
   return JSON.stringify(req.body)
 });
 
@@ -25,14 +25,14 @@ app.get('/api/persons', (request, response, next) => {
 app.get('/api/persons/:id', (request, response, next) => {
 	Person.findById(request.params.id).then((result) => {
 		if(!result){
-			return response.status(404).send({error: "NOT_FOUND"});
+			return response.status(404).send({ error: "NOT_FOUND" });
 		}
 		return response.json(result);
-	});
+	}).catch(error => next(error));
 })
 
 app.post('/api/persons', (request, response, next) => {
-	
+
 	const payload = {
 		name: request.body.name,
 		number: request.body.number
@@ -42,7 +42,7 @@ app.post('/api/persons', (request, response, next) => {
 	newPerson.save().then(result => {
 		console.log('note created', result);
 		response.json(result);
-	}).catch(error => next(error));	
+	}).catch(error => next(error));
 
 });
 
@@ -54,8 +54,8 @@ app.delete('/api/persons/:id', (request, response, next) => {
 })
 
 app.get('/info', (request, response, next) => {
-	
-	Person.find({}).then((result)=>{
+
+	Person.find({}).then((result) => {
 		response.send(`<div><div>Phonebook has info for ${result.length} people</div>${new Date()}</div>`);
 	}).catch(error => next(error));
 })
@@ -67,8 +67,8 @@ app.put('/api/persons/:id', (request, response, next) => {
 		name: request.body.name,
 		number: request.body.number
 	};
-	
-	Person.findByIdAndUpdate(request.params.id, payload, { new: true, runValidators: true }).then((result)=>{
+
+	Person.findByIdAndUpdate(request.params.id, payload, { new: true, runValidators: true }).then((result) => {
 		console.log('note updated', result);
 		response.json(result);
 	}).catch(error => next(error));
@@ -89,6 +89,7 @@ const errorHandler = (error, request, response, next) => {
 
 app.use(errorHandler)
 
+// eslint-disable-next-line no-undef
 const PORT = process.env.PORT || 3003
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
