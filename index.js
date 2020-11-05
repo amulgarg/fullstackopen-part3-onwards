@@ -87,7 +87,7 @@ app.get('/api/persons', (request, response) => {
 }) */
 
 app.post('/api/persons', (request, response) => {	
-	
+
 	const newPerson = new Person({
 		name: request.body.name,
 		number: request.body.number
@@ -96,7 +96,7 @@ app.post('/api/persons', (request, response) => {
 	newPerson.save().then(result => {
 		console.log('note saved!', result);
 		response.json(result);
-		mongoose.connection.close()
+		//mongoose.connection.close()
 	})
 
 	/* if(!newPerson.name){
@@ -120,17 +120,36 @@ app.post('/api/persons', (request, response) => {
   response.json(updatedPersons);	*/
 })
 
-/* app.delete('/api/persons/:id', (request, response) => {
+app.delete('/api/persons/:id', (request, response) => {
+	Person.findByIdAndRemove(request.params.id).then((result) => {
+		console.log('result', result);
+		//mongoose.connection.close();
+		return response.status(204).end();
+	}).catch(error => next(error))
+	
+	/* 
 	const remainingPersons = persons.filter(person => person.id != request.params.id);
 	if(remainingPersons.length === persons.length){
 		return response.status(404).send({error: "NOT_FOUND"});
 	} 
-  return response.status(204).end();
-}) */
+  return response.status(204).end(); */
+})
 
 /* app.get('/info', (request, response) => {
 	response.send(`<div><div>Phonebook has info for ${persons.length} people</div>${new Date()}</div>`);
 }) */
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  } 
+
+  next(error)
+}
+
+app.use(errorHandler)
 
 const PORT = process.env.PORT || 3003
 app.listen(PORT, () => {
