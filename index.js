@@ -79,13 +79,19 @@ app.get('/api/persons', (request, response, next) => {
 	}).catch(error => next(error));
 })
 
-/* app.get('/api/persons/:id', (request, response) => {
-	const person = persons.find(person => person.id == request.params.id)
+app.get('/api/persons/:id', (request, response, next) => {
+	Person.findById(request.params.id).then((result) => {
+		if(!result){
+			return response.status(404).send({error: "NOT_FOUND"});
+		}
+		return response.json(result);
+	});
+	/* const person = persons.find(person => person.id == request.params.id)
 	if(!person){
 		return response.status(404).send({error: "NOT_FOUND"});
 	} 
-  return response.json(person);
-}) */
+  return response.json(person); */
+})
 
 app.post('/api/persons', (request, response, next) => {
 	
@@ -137,9 +143,14 @@ app.delete('/api/persons/:id', (request, response, next) => {
   return response.status(204).end(); */
 })
 
-/* app.get('/info', (request, response) => {
-	response.send(`<div><div>Phonebook has info for ${persons.length} people</div>${new Date()}</div>`);
-}) */
+app.get('/info', (request, response, next) => {
+	
+	Person.find({}).then((result)=>{
+		response.send(`<div><div>Phonebook has info for ${result.length} people</div>${new Date()}</div>`);
+	}).catch(error => next(error));
+
+	/* response.send(`<div><div>Phonebook has info for ${persons.length} people</div>${new Date()}</div>`); */
+})
 
 
 app.put('/api/persons/:id', (request, response, next) => {
